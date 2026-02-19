@@ -1,6 +1,6 @@
 "use client";
 import { Navbar } from "@/components/navbar";
-import { RightSidebar } from "@/components/rightsidebar";
+import { RightSidebar } from "@/components/right-sidebar";
 import { Sidebar } from "@/components/sidebar";
 import { useEffect, useState } from "react";
 
@@ -25,14 +25,14 @@ export function Mainlayout({ children }: MainlayoutProps) {
     return (
         <div className="min-h-screen bg-[#f8f9fa] text-[#3a3a3a]">
             <Navbar handleSlideIn={handleSlideIn} />
-            <div className="flex max-w-full py-1 min-h-screen">
+            <div className="flex max-w-full min-h-screen py-1">
                 <Sidebar isOpen={sidebarOpen} onClose={handleSlideIn} />
-                <main className="flex-1 min-w-0 p-4 lg:p-6 bg-white">{children}</main>
-                <div className="hidden lg:block border border-gray-200">
+                <main className="flex-1 min-w-0 p-4 bg-white lg:p-6">{children}</main>
+                <div className="hidden border border-gray-200 lg:block">
                     <RightSidebar/>
                 </div>
             </div>
-            <footer className="bg-gray-200 text-center p-4">
+            <footer className="p-4 text-center bg-gray-200">
                 &copy; {new Date().getFullYear()} My Application. All rights reserved.
             </footer>
         </div>

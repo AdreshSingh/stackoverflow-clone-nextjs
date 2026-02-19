@@ -1,6 +1,6 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { questions } from "@/constants/questionList";
+import { questions } from "@/constants/question-list";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
@@ -11,38 +11,38 @@ export default function Home() {
 
   return (
     <main className="min-w-0">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-xl lg:text-2xl font-semibold">Top Questions</h1>
+      <div className="flex flex-col items-start justify-between gap-4 mb-6 sm:flex-row sm:items-center">
+        <h1 className="text-xl font-semibold lg:text-2xl">Top Questions</h1>
         <button
-          onClick={() => router.push("/ask")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium whitespace-nowrap"
+          onClick={() => router.push("/ask/1")}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 whitespace-nowrap"
         >
           Ask Question
         </button>
       </div>
       <div className="w-full">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 text-sm sm:gap-4 py-2 px-1">
+        <div className="flex flex-col items-start px-1 py-2 mb-4 text-sm sm:flex-row sm:items-center sm:gap-4">
           <span className="text-gray-600">{questions.length} questions</span>
           <div className="flex flex-wrap gap-1 sm:gap-2">
-            <button className="px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs sm:text-sm">
+            <button className="px-2 py-1 text-xs text-gray-700 bg-gray-200 rounded sm:px-3 sm:text-sm">
               Newest
             </button>
-            <button className="px-2 sm:px-3 py-1 text-gray-600 hover:bg-gray-100 rounded text-xs sm:text-sm">
+            <button className="px-2 py-1 text-xs text-gray-600 rounded sm:px-3 hover:bg-gray-100 sm:text-sm">
               Active
             </button>
-            <button className="px-2 sm:px-3 py-1 text-gray-600 hover:bg-gray-100 rounded flex items-center text-xs sm:text-sm">
+            <button className="flex items-center px-2 py-1 text-xs text-gray-600 rounded sm:px-3 hover:bg-gray-100 sm:text-sm">
               Bountied
               <Badge variant="secondary" className="ml-1 text-xs">
                 25
               </Badge>
             </button>
-            <button className="px-2 sm:px-3 py-1 text-gray-600 hover:bg-gray-100 rounded text-xs sm:text-sm">
+            <button className="px-2 py-1 text-xs text-gray-600 rounded sm:px-3 hover:bg-gray-100 sm:text-sm">
               Unanswered
             </button>
-            <button className="px-2 sm:px-3 py-1 text-gray-600 hover:bg-gray-100 rounded text-xs sm:text-sm">
+            <button className="px-2 py-1 text-xs text-gray-600 rounded sm:px-3 hover:bg-gray-100 sm:text-sm">
               More ▼
             </button>
-            <button className="px-2 sm:px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded ml-auto text-xs sm:text-sm">
+            <button className="px-2 py-1 ml-auto text-xs text-gray-600 border border-gray-300 rounded sm:px-3 hover:bg-gray-50 sm:text-sm">
               🔍 Filter
             </button>
           </div>
@@ -50,9 +50,9 @@ export default function Home() {
 
         <div className="space-y-4">
           {questions.map((question: any) => (
-            <div key={question.id} className="border-b border-gray-200 pb-4">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex sm:flex-col items-center sm:items-center text-sm text-gray-600 sm:w-16 lg:w-20 gap-4 sm:gap-2">
+            <div key={question.id} className="pb-4 border-b border-gray-200">
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="flex items-center gap-4 text-sm text-gray-600 sm:flex-col sm:items-center sm:w-16 lg:w-20 sm:gap-2">
                   <div className="text-center">
                     <div className="font-medium">
                       {question?.upvote?.length}
@@ -78,21 +78,21 @@ export default function Home() {
                 <div className="flex-1 min-w-0">
                   <Link
                     href={`/questions/${question._id}`}
-                    className="text-blue-600 hover:text-blue-800 text-base lg:text-lg font-medium mb-2 block"
+                    className="block mb-2 text-base font-medium text-blue-600 hover:text-blue-800 lg:text-lg"
                   >
                     {question.questiontitle}
                   </Link>
-                  <p className="text-gray-700 text-sm mb-3 line-clamp-2">
+                  <p className="mb-3 text-sm text-gray-700 line-clamp-2">
                     {question.questionbody}
                   </p>
 
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
                     <div className="flex flex-wrap gap-1">
                       {question.questiontags?.map((tag: any) => (
                         <div key={tag}>
                           <Badge
                             variant="secondary"
-                            className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200 cursor-pointer"
+                            className="text-xs text-blue-800 bg-blue-100 cursor-pointer hover:bg-blue-200"
                           >
                             {tag}
                           </Badge>
@@ -110,7 +110,7 @@ export default function Home() {
                             {question?.userposted?.[0]}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-blue-600 hover:text-blue-800 mr-1">
+                        <span className="mr-1 text-blue-600 hover:text-blue-800">
                           {question?.userposted}
                         </span>
                       </Link>

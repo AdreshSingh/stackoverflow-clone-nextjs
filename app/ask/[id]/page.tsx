@@ -1,8 +1,14 @@
+import { QuestionDetail } from "@/components/question-detail";
 
-export default function AskPage() {
-    return (
-        <div>
-            <h1>Ask a Question</h1>
-        </div>
-    );
+type id = {
+  params: Promise<{ slug: string }>;
+};
+
+export default function AskPage(id: id) {
+  return (
+    <div>
+      <h1>Ask a Question</h1>
+      <QuestionDetail questionId={1} />
+    </div>
+  );
 }
