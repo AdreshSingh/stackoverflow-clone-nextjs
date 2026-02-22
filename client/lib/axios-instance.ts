@@ -7,4 +7,15 @@ const axiosInstance = axios.create({
     }
 })
 
+axiosInstance.interceptors.request.use( req=> {
+    if(typeof window !== 'undefined') {
+        const user = localStorage.getItem('user');
+        if(user) {
+            req.headers['Authorization'] = `Bearer ${user}`;
+        }
+    }
+    return req;
+}, error => {    return Promise.reject(error);
+});
+
 export default axiosInstance;
