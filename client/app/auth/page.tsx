@@ -14,15 +14,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
-// import { useAuth } from "@/lib/AuthContext";
+import { useAuth } from "@/lib/auth-context";
 
 export default function AuthPage() {
   const router = useRouter();
-  //   const { Login, loading } = useAuth();
+  const { login, loading } = useAuth();
   const [form, setform] = useState({ email: "", password: "" });
+
+
   const handleChange = (e: any) => {
     setform({ ...form, [e.target.id]: e.target.value });
   };
+
+  
   const handlesubmit = async (e: any) => {
     e.preventDefault();
     if (!form.email || !form.password) {
@@ -30,7 +34,7 @@ export default function AuthPage() {
       return;
     }
     try {
-      //   await Login(form);
+      await login(form);
       router.push("/");
     } catch (error) {
       console.log(error);
@@ -142,7 +146,7 @@ export default function AuthPage() {
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-sm"
               >
-                {/* {loading ? "loading" : "Log in"} */}
+                {loading ? "loading" : "Log in"}
               </Button>
               <div className="text-center text-sm">
                 <Link href="#" className="text-blue-600 hover:underline">
