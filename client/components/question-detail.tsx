@@ -1,4 +1,7 @@
 "use client";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 import {
   Bookmark,
   ChevronDown,
@@ -9,18 +12,18 @@ import {
   Share,
   Trash,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Textarea } from "./ui/textarea";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
-// import axiosInstance from "@/lib/axiosinstance";
-// import Mainlayout from "@/layout/Mainlayout";
-// import { useAuth } from "@/lib/AuthContext";
+import axiosInstance from "@/lib/axios-instance";
+import {Mainlayout} from "@/layout/main-layout";
+import { useAuth } from "@/lib/auth-context";
+
+
+
 const questionData = {
   id: 3,
   title: "How can i block user with middleware?",
@@ -250,6 +253,8 @@ This approach is more robust and handles many edge cases automatically.`,
     userVote: null,
   },
 ];
+
+
 export const QuestionDetail = ({ questionId }: any) => {
   const router = useRouter();
   const [question, setquestion] = useState<any>(null);
@@ -257,151 +262,155 @@ export const QuestionDetail = ({ questionId }: any) => {
   const [newanswer, setnewAnswer] = useState("");
   const [isSubmitting, setisSubmitting] = useState(false);
   const [loading, setloading] = useState(true);
-  const { user } = { user: { _id: "123", name: "Test User" } }; //useAuth();
+  // const { user } = { user: { _id: "123", name: "Test User" } };// for testing
 
-  //   useEffect(() => {
-  //     const fetchuser = async () => {
-  //       try {
-  //         const res = await axiosInstance.get("/question/getallquestion");
-  //         const matchedquestion = res.data.data.find(
-  //           (u: any) => u._id === questionId,
-  //         );
-  //         setanswer(matchedquestion.answer);
-  //         setquestion(matchedquestion);
-  //       } catch (error) {
-  //         console.log(error);
-  //       } finally {
-  //         setloading(false);
-  //       }
-  //     };
-  //     fetchuser();
-  //   }, [questionId]);
-  //   if (loading) {
-  //     return (
-  //       <div className="w-10 h-10 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
-  //     );
-  //   }
-  //   if (!question) {
-  //     return (
-  //       <div className="mt-4 text-center text-gray-500">No question found.</div>
-  //     );
-  //   }
+  const {user} = useAuth();
+
+    useEffect(() => {
+      const fetchuser = async () => {
+        try {
+          const res = await axiosInstance.get("/question/getallquestion");
+          const matchedquestion = res.data.data.find(
+            (u: any) => u._id === questionId,
+          );
+          setanswer(matchedquestion.answer);
+          setquestion(matchedquestion);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setloading(false);
+        }
+      };
+      fetchuser();
+    }, [questionId]);
+    if (loading) {
+      return (
+        <div className="w-10 h-10 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
+      );
+    }
+    if (!question) {
+      return (
+        <div className="mt-4 text-center text-gray-500">No question found.</div>
+      );
+    }
 
   const handleVote = async (vote: String) => {
-    // if (!user) {
-    //   toast.info("Please login to continue");
-    //   router.push("/auth");
-    //   return;
-    // }
-    // try {
-    //   const res = await axiosInstance.patch(`/question/vote/${question._id}`, {
-    //     value: vote,
-    //     userid: user?._id,
-    //   });
-    //   if (res.data.data) {
-    //     setquestion(res.data.data);
-    //     toast.success("Vote Updated");
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error("Failed to Vote question");
-    // }
+    if (!user) {
+      toast.info("Please login to continue");
+      router.push("/auth");
+      return;
+    }
+    try {
+      const res = await axiosInstance.patch(`/question/vote/${question._id}`, {
+        value: vote,
+        userid: user?._id,
+      });
+      if (res.data.data) {
+        setquestion(res.data.data);
+        toast.success("Vote Updated");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to Vote question");
+    }
   };
+
   const handlebookmark = () => {
     setquestion((prev: any) => ({ ...prev, isBookmarked: !prev.isBookmarked }));
   };
+  
   const handleSubmitanswer = async () => {
-    // if (!user) {
-    //   toast.info("Please login to continue");
-    //   router.push("/auth");
-    //   return;
-    // }
-    // if (!newanswer.trim()) return;
-    // setisSubmitting(true);
-    // try {
-    //   const res = await axiosInstance.post(
-    //     `/answer/postanswer/${question?._id}`,
-    //     {
-    //       noofanswer: question.noofanswer,
-    //       answerbody: newanswer,
-    //       useranswered: user.name,
-    //       userid: user._id,
-    //     },
-    //   );
-    //   if (res.data.data) {
-    //     const newObj = {
-    //       answerbody: newanswer,
-    //       useranswered: user.name,
-    //       userid: user._id,
-    //       answeredon: new Date().toISOString(),
-    //     };
-    //     setquestion((prev: any) => ({
-    //       ...prev,
-    //       noofanswer: prev.noofanswer + 1,
-    //       answer: [...(prev.answer || []), newObj],
-    //     }));
-    //     toast.success("Answer Uploaded");
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error("Failed to Answer");
-    // } finally {
-    //   setnewAnswer("");
-    //   setisSubmitting(false);
-    // }
+    if (!user) {
+      toast.info("Please login to continue");
+      router.push("/auth");
+      return;
+    }
+    if (!newanswer.trim()) return;
+    setisSubmitting(true);
+    try {
+      const res = await axiosInstance.post(
+        `/answer/postanswer/${question?._id}`,
+        {
+          noofanswer: question.noofanswer,
+          answerbody: newanswer,
+          useranswered: user.name,
+          userid: user._id,
+        },
+      );
+      if (res.data.data) {
+        const newObj = {
+          answerbody: newanswer,
+          useranswered: user.name,
+          userid: user._id,
+          answeredon: new Date().toISOString(),
+        };
+        setquestion((prev: any) => ({
+          ...prev,
+          noofanswer: prev.noofanswer + 1,
+          answer: [...(prev.answer || []), newObj],
+        }));
+        toast.success("Answer Uploaded");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to Answer");
+    } finally {
+      setnewAnswer("");
+      setisSubmitting(false);
+    }
   };
 
   const handleDelete = async () => {
-    // if (!user) {
-    //   toast.info("Please login to continue");
-    //   router.push("/auth");
-    //   return;
-    // }
-    // if (!window.confirm("Are you sure you want to delete this question?"))
-    //   return;
-    // try {
-    //   const res = await axiosInstance.delete(
-    //     `/question/delete/${question._id}`,
-    //   );
-    //   if (res.data.message) {
-    //     toast.success(res.data.message);
-    //     router.push("/");
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error("Failed to delete question");
-    // }
+    if (!user) {
+      toast.info("Please login to continue");
+      router.push("/auth");
+      return;
+    }
+    if (!window.confirm("Are you sure you want to delete this question?"))
+      return;
+    try {
+      const res = await axiosInstance.delete(
+        `/question/delete/${question._id}`,
+      );
+      if (res.data.message) {
+        toast.success(res.data.message);
+        router.push("/");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete question");
+    }
   };
 
   const handleDeleteanswer = async (id: String) => {
-    // if (!user) {
-    //   toast.info("Please login to continue");
-    //   router.push("/auth");
-    //   return;
-    // }
-    // if (!window.confirm("Are you sure you want to delete this answer?")) return;
-    // try {
-    //   const res = await axiosInstance.delete(`/answer/delete/${question._id}`, {
-    //     data: {
-    //       noofanswer: question.noofanswer,
-    //       answerid: id,
-    //     },
-    //   });
-    //   if (res.data.data) {
-    //     const updateanswer = question.answer.filter(
-    //       (ans: any) => ans._id !== id,
-    //     );
-    //     setquestion((prev: any) => ({
-    //       ...prev,
-    //       noofanswer: updateanswer.length,
-    //       answer: updateanswer,
-    //     }));
-    //     toast.success("deleted successfully");
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error("Failed to delete question");
-    // }
+    if (!user) {
+      toast.info("Please login to continue");
+      router.push("/auth");
+      return;
+    }
+    if (!window.confirm("Are you sure you want to delete this answer?")) return;
+    try {
+      const res = await axiosInstance.delete(`/answer/delete/${question._id}`, {
+        data: {
+          noofanswer: question.noofanswer,
+          answerid: id,
+        },
+      });
+      if (res.data.data) {
+        const updateanswer = question.answer.filter(
+          (ans: any) => ans._id !== id,
+        );
+        setquestion((prev: any) => ({
+          ...prev,
+          noofanswer: updateanswer.length,
+          answer: updateanswer,
+        }));
+        toast.success("deleted successfully");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete question");
+    }
   };
 
   return (
@@ -455,11 +464,10 @@ export const QuestionDetail = ({ questionId }: any) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`p-2 ${
-                    question?.isBookmarked
-                      ? "text-yellow-500"
-                      : "text-gray-600 hover:text-yellow-500"
-                  }`}
+                  className={`p-2 ${question?.isBookmarked
+                    ? "text-yellow-500"
+                    : "text-gray-600 hover:text-yellow-500"
+                    }`}
                   onClick={handlebookmark}
                 >
                   <Bookmark
@@ -481,7 +489,7 @@ export const QuestionDetail = ({ questionId }: any) => {
                 <div
                   className="leading-relaxed text-gray-800"
                   dangerouslySetInnerHTML={{
-                    __html: question?.questionbody
+                    __html: (question?.questionbody ?? "")
                       .replace(
                         /## (.*)/g,
                         '<h3 class="text-lg font-semibold mt-6 mb-3 text-gray-900">$1</h3>',
@@ -505,7 +513,7 @@ export const QuestionDetail = ({ questionId }: any) => {
                 />
               </div>
               <div className="flex flex-wrap gap-2 mb-6">
-                {question?.questiontags.map((tag: any) => (
+                {question?.questiontags?.map((tag: any) => (
                   <Link key={tag} href={`/tags/${tag}`}>
                     <Badge
                       variant="secondary"
@@ -518,157 +526,138 @@ export const QuestionDetail = ({ questionId }: any) => {
               </div>
               <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600 hover:text-gray-800"
-                  >
-                    <Share className="w-4 h-4 mr-1" />
-                    Share
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600 hover:text-gray-800"
-                  >
-                    <Flag className="w-4 h-4 mr-1" />
-                    Flag
-                  </Button>
-                  {question?.userid === user?._id && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleDelete}
-                      className="text-red-600 hover:text-red-800"
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-gray-600">
+                      asked {new Date(question?.askedon ?? Date.now()).toLocaleDateString()}
+                    </span>
+                    <Link
+                      href={`/users/${question?.userid}`}
+                      className="flex items-center gap-2 p-2 rounded hover:bg-blue-50"
                     >
-                      <Trash className="w-4 h-4 mr-1" />
-                      Delete
-                    </Button>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-600">
-                    asked {new Date(question?.askedon).toLocaleDateString()}
-                  </span>
-                  <Link
-                    href={`/users/${question?.userid}`}
-                    className="flex items-center gap-2 p-2 rounded hover:bg-blue-50"
-                  >
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="text-sm">
-                        {question?.userposted[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-blue-600 hover:text-blue-800">
-                        {question?.userposted}
+                      <Avatar className="w-8 h-8">
+                        <AvatarFallback className="text-sm">
+                          {question?.userposted?.[0] ?? ""}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium text-blue-600 hover:text-blue-800">
+                          {question?.userposted ?? ""}
+                        </div>
                       </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDelete}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash className="w-4 h-4 mr-1" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+              <div className="mb-8">
+                <h2 className="mb-6 text-xl font-semibold text-gray-900">
+                  {question?.answer?.length ?? 0} Answer
+                  {(question?.answer?.length ?? 0) !== 1 ? "s" : ""}
+                </h2>
+                <div className="space-y-6">
+                  {(question?.answer ?? []).map((ans: any) => (
+                    <Card key={ans?._id} className={""}>
+                      <CardContent className="p-0">
+                        <div className="flex flex-col sm:flex-row">
+                          {/* Answer Content */}
+                          <div className="flex-1 p-4 sm:p-6">
+                            <div className="mb-6 prose max-w-none">
+                              <div
+                                className="leading-relaxed text-gray-800"
+                                dangerouslySetInnerHTML={{
+                                  __html: (ans?.answerbody ?? "")
+                                    .replace(
+                                      /## (.*)/g,
+                                      '<h3 class="text-lg font-semibold mt-6 mb-3 text-gray-900">$1</h3>',
+                                    )
+                                    .replace(
+                                      /```(\w+)?\n([\s\S]*?)```/g,
+                                      '<pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto my-4"><code class="text-sm">$2</code></pre>',
+                                    )
+                                    .replace(
+                                      /`([^`]+)`/g,
+                                      '<code class="bg-gray-100 px-2 py-1 rounded text-sm">$1</code>',
+                                    )
+                                    .replace(/\n\n/g, '</p><p class="mb-4">')
+                                    .replace(/^/, '<p class="mb-4">')
+                                    .replace(/$/, "</p>")
+                                    .replace(
+                                      /\n(\d+\. .*)/g,
+                                      '<ol class="list-decimal list-inside my-4"><li>$1</li></ol>',
+                                    ),
+                                }}
+                              />
+                            </div>
+                            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-gray-600 hover:text-gray-800"
+                                >
+                                  <Share className="w-4 h-4 mr-1" />
+                                  Share
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-gray-600 hover:text-gray-800"
+                                >
+                                  <Flag className="w-4 h-4 mr-1" />
+                                  Flag
+                                </Button>
+                                {ans?.userid === user?._id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDeleteanswer(ans._id)}
+                                    className="text-red-600 hover:text-red-800"
+                                  >
+                                    <Trash className="w-4 h-4 mr-1" />
+                                    Delete
+                                  </Button>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 text-sm">
+                                <span className="text-gray-600">
+                                  answerd {ans?.answeredon}
+                                </span>
+                                <Link
+                                  href={`/users/${ans?.userid}`}
+                                  className="flex items-center gap-2 p-2 rounded hover:bg-blue-50"
+                                >
+                                  <Avatar className="w-8 h-8">
+                                    <AvatarFallback className="text-sm">
+                                      {ans?.useranswered?.[0] ?? ""}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <div className="font-medium text-blue-600 hover:text-blue-800">
+                                      {ans?.useranswered ?? ""}
+                                    </div>
+                                  </div>
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
-      <div className="mb-8">
-        <h2 className="mb-6 text-xl font-semibold text-gray-900">
-          {question?.answer.length} Answer
-          {question?.answer.length !== 1 ? "s" : ""}
-        </h2>
-        <div className="space-y-6">
-          {question?.answer.map((ans: any) => (
-            <Card key={ans?._id} className={""}>
-              <CardContent className="p-0">
-                <div className="flex flex-col sm:flex-row">
-                  {/* Answer Content */}
-                  <div className="flex-1 p-4 sm:p-6">
-                    <div className="mb-6 prose max-w-none">
-                      <div
-                        className="leading-relaxed text-gray-800"
-                        dangerouslySetInnerHTML={{
-                          __html: ans?.answerbody
-                            .replace(
-                              /## (.*)/g,
-                              '<h3 class="text-lg font-semibold mt-6 mb-3 text-gray-900">$1</h3>',
-                            )
-                            .replace(
-                              /```(\w+)?\n([\s\S]*?)```/g,
-                              '<pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto my-4"><code class="text-sm">$2</code></pre>',
-                            )
-                            .replace(
-                              /`([^`]+)`/g,
-                              '<code class="bg-gray-100 px-2 py-1 rounded text-sm">$1</code>',
-                            )
-                            .replace(/\n\n/g, '</p><p class="mb-4">')
-                            .replace(/^/, '<p class="mb-4">')
-                            .replace(/$/, "</p>")
-                            .replace(
-                              /\n(\d+\. .*)/g,
-                              '<ol class="list-decimal list-inside my-4"><li>$1</li></ol>',
-                            ),
-                        }}
-                      />
-                    </div>
-                    <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-600 hover:text-gray-800"
-                        >
-                          <Share className="w-4 h-4 mr-1" />
-                          Share
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-600 hover:text-gray-800"
-                        >
-                          <Flag className="w-4 h-4 mr-1" />
-                          Flag
-                        </Button>
-                        {ans.userid === user?._id && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteanswer(ans._id)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <Trash className="w-4 h-4 mr-1" />
-                            Delete
-                          </Button>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-600">
-                          answerd {ans?.answeredon}
-                        </span>
-                        <Link
-                          href={`/users/${ans?.userid}`}
-                          className="flex items-center gap-2 p-2 rounded hover:bg-blue-50"
-                        >
-                          <Avatar className="w-8 h-8">
-                            <AvatarFallback className="text-sm">
-                              {ans.useranswered[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium text-blue-600 hover:text-blue-800">
-                              {ans?.useranswered}
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
       <Card>
         <CardContent className="p-6">
           <h3 className="mb-4 text-lg font-semibold text-gray-900">

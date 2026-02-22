@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Calendar, Search } from "lucide-react";
 
-// import axiosInstance from "@/lib/axiosinstance";
+import axiosInstance from "@/lib/axios-instance";
 const users = [
   {
     id: 1,
@@ -34,22 +34,24 @@ const users = [
     joinDate: "2024-01-05",
   },
 ];
+
 const index = () => {
   const [users, setusers] = useState<any>(null);
   const [loading, setloading] = useState(true);
-//   useEffect(() => {
-//     const fetchuser = async () => {
-//       try {
-//         const res = await axiosInstance.get("/user/getalluser");
-//         setusers(res.data.data);
-//       } catch (error) {
-//         console.log(error);
-//       } finally {
-//         setloading(false);
-//       }
-//     };
-//     fetchuser();
-//   }, []);
+  useEffect(() => {
+    const fetchuser = async () => {
+      try {
+        const res = await axiosInstance.get("/auth/getallusers");
+        setusers(res.data.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setloading(false);
+      }
+    };
+    fetchuser();
+  }, []);
+
   if (loading) {
     return (
     //   <Mainlayout>
@@ -57,11 +59,15 @@ const index = () => {
     //   </Mainlayout>
     );
   }
+
+
   if (!users || users.length === 0) {
     return (
       <div className="text-center text-gray-500 mt-4">No users found.</div>
     );
   }
+
+
   return (
     // <Mainlayout>
       <div className="max-w-6xl">
